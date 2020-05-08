@@ -1,6 +1,5 @@
-#
 # nginx-proxy-manager Dockerfile
-#
+# Fork of jlesage/docker-nginx-proxy-manager using default ports
 # https://github.com/jlesage/docker-nginx-proxy-manager
 #
 
@@ -117,24 +116,24 @@ RUN \
     rm /etc/nginx/conf.d/dev.conf && \
 
     # Change the management interface port to the unprivileged port 8181.
-    sed-patch 's|81 default|8181 default|' /etc/nginx/conf.d/production.conf && \
+#    sed-patch 's|81 default|8181 default|' /etc/nginx/conf.d/production.conf && \
 
     # Change the management interface root.
     sed-patch 's|/app/frontend;|/opt/nginx-proxy-manager/frontend;|' /etc/nginx/conf.d/production.conf && \
 
     # Change the HTTP port 80 to the unprivileged port 8080.
-    sed-patch 's|80;|8080;|' /etc/nginx/conf.d/default.conf && \
-    sed-patch 's|"80";|"8080";|' /etc/nginx/conf.d/default.conf && \
-    sed-patch 's|listen 80;|listen 8080;|' /opt/nginx-proxy-manager/templates/letsencrypt-request.conf && \
-    sed-patch 's|listen 80;|listen 8080;|' /opt/nginx-proxy-manager/templates/_listen.conf && \
-    sed-patch 's|:80;|:8080;|' /opt/nginx-proxy-manager/templates/_listen.conf && \
-    sed-patch 's|listen 80 |listen 8080 |' /opt/nginx-proxy-manager/templates/default.conf && \
+#    sed-patch 's|80;|8080;|' /etc/nginx/conf.d/default.conf && \
+#    sed-patch 's|"80";|"8080";|' /etc/nginx/conf.d/default.conf && \
+#    sed-patch 's|listen 80;|listen 8080;|' /opt/nginx-proxy-manager/templates/letsencrypt-request.conf && \
+#    sed-patch 's|listen 80;|listen 8080;|' /opt/nginx-proxy-manager/templates/_listen.conf && \
+#    sed-patch 's|:80;|:8080;|' /opt/nginx-proxy-manager/templates/_listen.conf && \
+#    sed-patch 's|listen 80 |listen 8080 |' /opt/nginx-proxy-manager/templates/default.conf && \
 
     # Change the HTTPs port 443 to the unprivileged port 4443.
-    sed-patch 's|443 |4443 |' /etc/nginx/conf.d/default.conf && \
-    sed-patch 's|"443";|"4443";|' /etc/nginx/conf.d/default.conf && \
-    sed-patch 's|listen 443 |listen 4443 |' /opt/nginx-proxy-manager/templates/_listen.conf && \
-    sed-patch 's|:443;|:4443;|' /opt/nginx-proxy-manager/templates/_listen.conf && \
+#    sed-patch 's|443 |4443 |' /etc/nginx/conf.d/default.conf && \
+#    sed-patch 's|"443";|"4443";|' /etc/nginx/conf.d/default.conf && \
+#    sed-patch 's|listen 443 |listen 4443 |' /opt/nginx-proxy-manager/templates/_listen.conf && \
+#    sed-patch 's|:443;|:4443;|' /opt/nginx-proxy-manager/templates/_listen.conf && \
 
     # Fix nginx test command line.
     sed-patch 's|-g "error_log off;"||' /opt/nginx-proxy-manager/internal/nginx.js && \
@@ -188,13 +187,18 @@ RUN \
         musl-dev \
         && \
     mkdir /tmp/go && \
-    env GOPATH=/tmp/go go get gophers.dev/cmds/bcrypt-tool && \
+    env GOPATH=/tmp/go go get github.com/shoenig/bcrypt-tool && \
     strip /tmp/go/bin/bcrypt-tool && \
     upx /tmp/go/bin/bcrypt-tool && \
     cp -v /tmp/go/bin/bcrypt-tool /usr/bin/ && \
     # Cleanup.
     del-pkg build-dependencies && \
     rm -rf /tmp/* /tmp/.[!.]*
+
+# change nginx run as root, we want expose 80 443 81 port.
+RUN sed-patch 's|#user root;|user root;|' /etc/nginx/nginx.conf && \
+    chown  root /usr/sbin/nginx && \
+    chmod u+s /usr/sbin/nginx
 
 # Add files.
 COPY rootfs/ /
@@ -210,12 +214,13 @@ VOLUME ["/config"]
 #   - 8080: HTTP traffic
 #   - 4443: HTTPs traffic
 #   - 8181: Management web interface
-EXPOSE 8080 4443 8181
+#EXPOSE 8080 4443 8181
+EXPOSE 80 443 81
 
 # Metadata.
 LABEL \
       org.label-schema.name="nginx-proxy-manager" \
-      org.label-schema.description="Docker container for Nginx Proxy Manager" \
+      org.label-schema.description="Docker container for Nginx Proxy Manager (using default ports '80 443 81')" \
       org.label-schema.version="$DOCKER_IMAGE_VERSION" \
-      org.label-schema.vcs-url="https://github.com/jlesage/docker-nginx-proxy-manager" \
+      org.label-schema.vcs-url="https://github.com/sujianchao/docker-nginx-proxy-manager" \
       org.label-schema.schema-version="1.0"

@@ -20,9 +20,9 @@ Launch the Nginx Proxy Manager docker container with the following command:
 ```
 docker run -d \
     --name=nginx-proxy-manager \
-    -p 8181:8181 \
-    -p 8080:8080 \
-    -p 4443:4443 \
+    -p 81:81 \
+    -p 80:80 \
+    -p 443:443 \
     -v /docker/appdata/nginx-proxy-manager:/config:rw \
     jlesage/nginx-proxy-manager
 ```
@@ -30,7 +30,7 @@ docker run -d \
 Where:
   - `/docker/appdata/nginx-proxy-manager`: This is where the application stores its configuration, log and any files needing persistency.
 
-Browse to `http://your-host-ip:8181` to access the Nginx Proxy Manager web interface.
+Browse to `http://your-host-ip:81` to access the Nginx Proxy Manager web interface.
 
 ## Documentation
 

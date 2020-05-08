@@ -43,9 +43,9 @@ Launch the Nginx Proxy Manager docker container with the following command:
 ```
 docker run -d \
     --name=nginx-proxy-manager \
-    -p 8181:8181 \
-    -p 8080:8080 \
-    -p 4443:4443 \
+    -p 81:81 \
+    -p 80:80 \
+    -p 443:443 \
     -v /docker/appdata/nginx-proxy-manager:/config:rw \
     jlesage/nginx-proxy-manager
 ```
@@ -53,7 +53,7 @@ docker run -d \
 Where:
   - `/docker/appdata/nginx-proxy-manager`: This is where the application stores its configuration, log and any files needing persistency.
 
-Browse to `http://your-host-ip:8181` to access the Nginx Proxy Manager web interface.
+Browse to `http://your-host-ip:81` to access the Nginx Proxy Manager web interface.
 
 ## Usage
 
@@ -108,9 +108,9 @@ container cannot be changed, but you are free to use any port on the host side.
 
 | Port | Mapping to host | Description |
 |------|-----------------|-------------|
-| 8181 | Mandatory | Port used to access the web interface of the application. |
-| 8080 | Mandatory | Port used to serve HTTP requests. |
-| 4443 | Mandatory | Port used to serve HTTPs requests. |
+| 81 | Mandatory | Port used to access the web interface of the application. |
+| 80 | Mandatory | Port used to serve HTTP requests. |
+| 443 | Mandatory | Port used to serve HTTPs requests. |
 
 ### Changing Parameters of a Running Container
 
@@ -152,9 +152,9 @@ services:
     image: jlesage/nginx-proxy-manager
     build: .
     ports:
-      - "8181:8181"
-      - "8080:8080"
-      - "4443:4443"
+      - "81:81"
+      - "80:80"
+      - "443:443"
     volumes:
       - "/docker/appdata/nginx-proxy-manager:/config:rw"
 ```
@@ -235,7 +235,7 @@ Assuming that container's ports are mapped to the same host's ports, the
 interface of the application can be accessed with a web browser at:
 
 ```
-http://<HOST IP ADDR>:8181
+http://<HOST IP ADDR>:81
 ```
 
 ## Shell Access
@@ -283,8 +283,8 @@ to be forwarded:
 
 | Traffic type | Container port | Host port mapped to container | External port | Internal port | Internal IP address                           |
 |--------------|----------------|-------------------------------|---------------|---------------|-----------------------------------------------|
-| HTTP         | 8080           | XXXX                          | 80            | XXXX          | IP address of the host running the container. |
-| HTTPs        | 4443           | YYYY                          | 443           | YYYY          | IP address of the host running the container. |
+| HTTP         | 80           | XXXX                          | 80            | XXXX          | IP address of the host running the container. |
+| HTTPs        | 443           | YYYY                          | 443           | YYYY          | IP address of the host running the container. |
 
 `XXXX` and `YYYY` are configurable port values.  Unless they conflict with other
 used ports on the host, they can simply be set to the same value as the
